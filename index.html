@@ -1,20 +1,436 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>SVC Grievance Redressal System</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>SVC Grievance Redressal System</h1>
-  <form id="grievanceForm">
-    <input type="text" name="name" placeholder="Your Name" required><br>
-    <input type="email" name="email" placeholder="Your Email" required><br>
-    <input type="text" name="phone" placeholder="Phone Number" required><br>
-    <textarea name="grievance" placeholder="Enter your grievance here..." required></textarea><br>
-    <button type="submit">Submit</button>
-  </form>
-  <p id="status"></p>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grievance Redressal Mechanism</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151; /* Darker gray for labels */
+        }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group select,
+        .form-group textarea { /* Added textarea here */
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db; /* Light gray border */
+            border-radius: 0.5rem; /* Slightly rounded */
+            font-size: 1rem;
+            color: #4b5563; /* Medium gray text */
+            transition: border-color 0.2s ease-in-out;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group input[type="tel"]:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { /* Added textarea here */
+            outline: none;
+            border-color: #2563eb; /* Blue border on focus */
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* Light blue shadow on focus */
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex; /* For centering content and spinner */
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem; /* Space between text and spinner */
+        }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background-color: #2563eb; /* Blue background */
+            color: #ffffff;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Darker blue on hover */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Gray background */
+            color: #ffffff;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Darker gray on hover */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .radio-group label {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1.5rem;
+            cursor: pointer;
+        }
+        .radio-group input[type="radio"] {
+            margin-right: 0.5rem;
+        }
+        .alert-box {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        .alert-success {
+            background-color: #d1fae5; /* Light green */
+            color: #065f46; /* Dark green text */
+            border: 1px solid #34d399;
+        }
+        .alert-error {
+            background-color: #fee2e2; /* Light red */
+            color: #991b1b; /* Dark red text */
+            border: 1px solid #ef4444;
+        }
+        .status-field {
+            padding: 0.75rem;
+            background-color: #f9fafb; /* Very light gray */
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        .status-field strong {
+            color: #1f2937; /* Darker text for labels */
+        }
+        .status-field span {
+            color: #4b5563; /* Medium gray for values */
+        }
 
-  <script src="script.js"></script>
+        /* Spinner CSS */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 1rem;
+            height: 1rem;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Grievance Redressal Mechanism</h1>
+
+        <!-- Grievance Submission Form -->
+        <section class="mb-12 p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">Submit a New Grievance</h2>
+            <form id="grievanceForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="Name" placeholder="Your Full Name" required class="rounded-lg">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="Email" placeholder="your.email@example.com" required class="rounded-lg">
+                    </div>
+                    <div class="form-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="tel" id="mobile" name="Mobile Number" placeholder="e.g., 9876543210" pattern="[0-9]{10}" title="Please enter a 10-digit mobile number" required class="rounded-lg">
+                    </div>
+                    <div class="form-group">
+                        <label for="rollNumber">College Roll Number</labeL>
+                        <input type="text" id="rollNumber" name="College Roll Number" placeholder="e.g., 1123XXX" required class="rounded-lg">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="course">Course</label>
+                        <select id="course" name="Course" required class="rounded-lg">
+                            <option value="">Select your course</option>
+                            <option value="BSC Life Sciences">BSC Life Sciences</option>
+                            <option value="BSC Botany Honors">BSC Botany Honors</option>
+                            <option value="BSC Zoology Honors">BSC Zoology Honors</option>
+                            <option value="BSC Chemistry Honors">BSC Chemistry Honors</option>
+                            <!-- Add all other possible courses here -->
+                            <option value="B.Tech Computer Science">B.Tech Computer Science</option>
+                            <option value="B.Tech Electronics">B.Tech Electronics</option>
+                            <option value="BA English Honors">BA English Honors</option>
+                            <option value="BA History Honors">BA History Honors</option>
+                            <option value="B.Com Honors">B.Com Honors</option>
+                            <option value="BBA">BBA</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <select id="year" name="Year" required class="rounded-lg">
+                            <option value="">Select your year</option>
+                            <option value="I">I</option>
+                            <option value="II">II</option>
+                            <option value="III">III</option>
+                            <option value="IV">IV</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>First Grievance?</label>
+                    <div class="radio-group flex flex-wrap gap-4 mt-2">
+                        <label>
+                            <input type="radio" name="First Grievance" value="Yes" required class="form-radio text-blue-600">
+                            Yes
+                        </label>
+                        <label>
+                            <input type="radio" name="First Grievance" value="No" class="form-radio text-blue-600">
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="grievanceType">Type of Grievance</label>
+                    <select id="grievanceType" name="Type of Grievance" required class="rounded-lg">
+                        <option value="">Select grievance type</option>
+                        <option value="Admin">Admin (Issues related to college administration, policies, or staff conduct)</option>
+                        <option value="Canteen">Canteen (Concerns about food quality, hygiene, pricing, or service)</option>
+                        <option value="Infrastructure">Infrastructure (Problems with college buildings, facilities, equipment, or maintenance)</option>
+                        <option value="Academics">Academics (Issues concerning courses, faculty, exams, grading, or academic support)</option>
+                        <option value="Personal">Personal (Individual concerns, harassment, or sensitive matters requiring privacy)</option>
+                        <option value="Hostel">Hostel (Complaints related to hostel accommodation, amenities, or management)</option>
+                    </select>
+                    <p class="text-sm text-gray-500 mt-1">Select the category that best describes your grievance.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="grievanceDescription">Description of the Grievance</label>
+                    <textarea id="grievanceDescription" name="Grievance Description" rows="4" placeholder="Please provide a detailed description of your grievance here." required class="rounded-lg"></textarea>
+                </div>
+
+                <div class="flex items-center mt-6">
+                    <input type="checkbox" id="confirmInfo" required class="form-checkbox text-blue-600 rounded">
+                    <label for="confirmInfo" class="ml-2 text-gray-700 text-sm md:text-base">I confirm all the info given by me is correct.</label>
+                </div>
+
+                <button type="submit" id="submitButton" class="btn btn-primary w-full mt-8">
+                    <span id="submitButtonText">Submit Grievance</span>
+                    <span id="submitSpinner" class="spinner hidden"></span>
+                </button>
+
+                <div id="grievanceIdDisplay" class="alert-box alert-success hidden text-center">
+                    Your Grievance ID: <strong id="generatedGrievanceId"></strong>. Please save this for tracking.
+                </div>
+            </form>
+        </section>
+
+        <!-- Grievance Status Tracker -->
+        <section class="p-6 bg-white rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">Track Grievance Status</h2>
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <input type="text" id="trackGrievanceId" placeholder="Enter your Grievance ID" class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                <button type="button" id="trackButton" class="btn btn-secondary flex-shrink-0">
+                    <span id="trackButtonText">Track Status</span>
+                    <span id="trackSpinner" class="spinner hidden"></span>
+                </button>
+            </div>
+
+            <div id="statusResult" class="hidden">
+                <div class="status-field">
+                    <strong>Status of the Grievance:</strong> <span id="statusValue"></span>
+                </div>
+                <div class="status-field">
+                    <strong>Date and Time Submitted:</strong> <span id="dateTimeValue"></span>
+                </div>
+                <div class="status-field">
+                    <strong>Response from the Admin:</strong> <span id="adminResponseValue"></span>
+                </div>
+            </div>
+            <div id="statusMessage" class="alert-box alert-error hidden text-center"></div>
+        </section>
+    </div>
+
+    <script>
+        // IMPORTANT: Replace this with YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL.
+        // This is the most common reason the app doesn't work.
+        // Follow the steps in previous responses to get your unique URL from Apps Script.
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZAiEaAlkEgPrP3sx-jvH2j8-X4y2mGUjfW0zP_MbE6M_VDLC2duAP1QohxtXQbATF/exec'; // <--- YOU MUST REPLACE THIS PLACEHOLDER!
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grievanceForm = document.getElementById('grievanceForm');
+            const grievanceIdDisplay = document.getElementById('grievanceIdDisplay');
+            const generatedGrievanceId = document.getElementById('generatedGrievanceId');
+            const trackGrievanceIdInput = document.getElementById('trackGrievanceId');
+            const trackButton = document.getElementById('trackButton');
+            const statusResultDiv = document.getElementById('statusResult');
+            const statusMessageDiv = document.getElementById('statusMessage');
+
+            const submitButton = document.getElementById('submitButton');
+            const submitButtonText = document.getElementById('submitButtonText');
+            const submitSpinner = document.getElementById('submitSpinner');
+
+            const trackButtonText = document.getElementById('trackButtonText');
+            const trackSpinner = document.getElementById('trackSpinner');
+
+
+            // Function to generate a unique grievance ID in the format GRV-XXXX
+            function generateUniqueGrievanceId() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let randomString = '';
+                for (let i = 0; i < 4; i++) {
+                    randomString += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return `GRV-${randomString}`;
+            }
+
+            // Function to show loading state for buttons
+            function showLoading(button, textSpan, spinnerSpan) {
+                button.disabled = true;
+                textSpan.classList.add('hidden');
+                spinnerSpan.classList.remove('hidden');
+            }
+
+            // Function to hide loading state for buttons
+            function hideLoading(button, textSpan, spinnerSpan, originalText) {
+                button.disabled = false;
+                textSpan.classList.remove('hidden');
+                spinnerSpan.classList.add('hidden');
+                textSpan.textContent = originalText;
+            }
+
+
+            // Handle form submission
+            grievanceForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // Prevent default form submission
+
+                // Hide any previous grievance ID display or error messages
+                grievanceIdDisplay.classList.add('hidden');
+                statusMessageDiv.classList.add('hidden');
+                statusResultDiv.classList.add('hidden');
+
+                showLoading(submitButton, submitButtonText, submitSpinner);
+                submitButtonText.textContent = 'Submitting...';
+
+
+                const formData = new FormData(grievanceForm);
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+
+                const uniqueId = generateUniqueGrievanceId();
+                data['Grievance ID'] = uniqueId;
+                data['Submission Date/Time'] = new Date().toLocaleString(); // Auto-update submission timestamp
+                data['Status'] = 'Pending'; // Initial status
+
+                try {
+                    // Send data to Google Apps Script
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Required for simple POST to Apps Script from client-side
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams(data).toString(), // Send as URL-encoded form data
+                    });
+
+                    // Since mode: 'no-cors' is used, we can't directly read the response.
+                    // Assume success if no network error. The Apps Script will handle writing and email.
+                    grievanceForm.reset(); // Clear the form
+                    document.getElementById('confirmInfo').checked = false; // Uncheck the checkbox
+
+                    generatedGrievanceId.textContent = uniqueId;
+                    grievanceIdDisplay.classList.remove('hidden');
+                    grievanceIdDisplay.classList.remove('alert-error'); // Ensure it's not red from a previous error
+                    grievanceIdDisplay.classList.add('alert-success');
+                    grievanceIdDisplay.scrollIntoView({ behavior: 'smooth' }); // Scroll to the ID
+
+                } catch (error) {
+                    console.error('Error submitting grievance:', error);
+                    grievanceIdDisplay.textContent = 'There was an error submitting your grievance. Please try again.';
+                    grievanceIdDisplay.classList.remove('hidden');
+                    grievanceIdDisplay.classList.remove('alert-success');
+                    grievanceIdDisplay.classList.add('alert-error');
+                } finally {
+                    hideLoading(submitButton, submitButtonText, submitSpinner, 'Submit Grievance');
+                }
+            });
+
+           // Handle status tracking
+trackButton.addEventListener('click', async () => {
+    const grievanceId = trackGrievanceIdInput.value.trim();
+    statusResultDiv.classList.add('hidden');
+    statusMessageDiv.classList.add('hidden');
+    statusMessageDiv.classList.remove('alert-success'); // Clear previous styles
+
+    if (!grievanceId) {
+        statusMessageDiv.textContent = 'Please enter a Grievance ID.';
+        statusMessageDiv.classList.remove('hidden');
+        statusMessageDiv.classList.add('alert-error');
+        return;
+    }
+
+    showLoading(trackButton, trackButtonText, trackSpinner);
+    trackButtonText.textContent = 'Fetching...';
+
+    try {
+        // Add a timestamp parameter to prevent caching
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?id=${encodeURIComponent(grievanceId)}&t=${timestamp}`);
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            // Update all fields including the admin response
+            document.getElementById('statusValue').textContent = result.data.Status || 'Pending';
+            document.getElementById('dateTimeValue').textContent = result.data['Submission Date/Time'] || 'Not available';
+            
+            // Handle the admin response field properly
+            const adminResponse = result.data['Response from Admin'];
+            document.getElementById('adminResponseValue').textContent = 
+                adminResponse && adminResponse.trim() !== '' ? adminResponse : 'No response yet.';
+            
+            statusResultDiv.classList.remove('hidden');
+        } else {
+            statusMessageDiv.textContent = result.message || 'Grievance ID not found or an error occurred.';
+            statusMessageDiv.classList.remove('hidden');
+            statusMessageDiv.classList.add('alert-error');
+        }
+    } catch (error) {
+        console.error('Error fetching grievance status:', error);
+        statusMessageDiv.textContent = 'Could not connect to the tracking service. Please try again later.';
+        statusMessageDiv.classList.remove('hidden');
+        statusMessageDiv.classList.add('alert-error');
+    } finally {
+        hideLoading(trackButton, trackButtonText, trackSpinner, 'Track Status');
+    }
+});
+        });
+    </script>
 </body>
 </html>
