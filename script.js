@@ -9,7 +9,7 @@ document.getElementById("grievanceForm").addEventListener("submit", function(e) 
     grievance: form.grievance.value
   };
 
-  fetch(https://script.google.com/macros/s/AKfycbzV1T8BlhJel2eDMF_sREZQAUxnnkR4nRPUT-5QUI4bsdkXKEsAdaMcT-IRA_u-wWjWdA/exec, {
+  fetch(https://script.google.com/macros/s/AKfycbxRP_bcTNmxjrpuXUs94bwK4PTrPUQUDU8cJ86mUbrv0OWxB-TnaifIQ6TNjRGDGOs4TQ/exec, {
     method: "POST",
     body: JSON.stringify(data),
     headers: {
