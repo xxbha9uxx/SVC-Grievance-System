@@ -1,28 +1,26 @@
-function checkStatus() {
-  const id = document.getElementById("grievanceId").value.trim();
-  if (!id) {
-    alert("Please enter a valid Grievance ID.");
-    return;
-  }
+document.getElementById("grievanceForm").addEventListener("submit", function(e) {
+  e.preventDefault();
 
-  fetch("https://script.google.com/macros/s/AKfycbziUdSyvSL_AA_moPEE1j82_x18EzF_H-naUsxjQCggMsUAvS9G3EjtSzdbZTbr_0JiSQ/exec", {
+  const form = e.target;
+  const data = {
+    name: form.name.value,
+    email: form.email.value,
+    phone: form.phone.value,
+    grievance: form.grievance.value
+  };
+
+  fetch(https://script.google.com/macros/s/AKfycbzV1T8BlhJel2eDMF_sREZQAUxnnkR4nRPUT-5QUI4bsdkXKEsAdaMcT-IRA_u-wWjWdA/exec, {
     method: "POST",
-    body: new URLSearchParams({ id: id })
-  })
-  .then(res => res.json())
-  .then(data => {
-    const result = document.getElementById("result");
-    if (data.error) {
-      result.innerHTML = `<p style="color: red;">❌ ${data.error}</p>`;
-    } else {
-      result.innerHTML = `
-        <p><strong>Status:</strong> ${data.status}</p>
-        <p><strong>Admin Response:</strong> ${data.response}</p>
-        <p><strong>Submitted At:</strong> ${data.submittedAt}</p>
-      `;
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
     }
-  })
-  .catch(() => {
-    document.getElementById("result").innerHTML = "⚠️ Error retrieving data.";
+  }).then(res => {
+    if (res.ok) {
+      document.getElementById("statusMsg").innerText = "Submitted successfully ✅";
+      form.reset();
+    } else {
+      document.getElementById("statusMsg").innerText = "Error! Try again ❌";
+    }
   });
-}
+});
