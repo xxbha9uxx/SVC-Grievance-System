@@ -1,22 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SVC Grievance Form</title>
+  <title>SVC Grievance Redressal System</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>SVC Grievance Redressal Form</h1>
-    <form id="grievanceForm">
-      <input type="text" name="name" placeholder="Your Name" required><br>
-      <input type="email" name="email" placeholder="Your Email" required><br>
-      <input type="tel" name="phone" placeholder="Contact Number" required><br>
-      <textarea name="grievance" placeholder="Write your grievance here..." required></textarea><br>
-      <button type="submit">Submit</button>
-    </form>
-    <p id="statusMsg"></p>
-  </div>
+  <h1>SVC Grievance Redressal System</h1>
+  <form id="grievanceForm">
+    <input type="text" name="name" placeholder="Your Name" required><br>
+    <input type="email" name="email" placeholder="Your Email" required><br>
+    <input type="text" name="phone" placeholder="Phone Number" required><br>
+    <textarea name="grievance" placeholder="Enter your grievance here..." required></textarea><br>
+    <button type="submit">Submit</button>
+  </form>
+  <p id="status"></p>
+
   <script src="script.js"></script>
 </body>
 </html>
-
